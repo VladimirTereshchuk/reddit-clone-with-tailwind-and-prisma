@@ -17,8 +17,6 @@ export default function Nav() {
   //   { value: "vanilla", label: "Vanilla" },
   // ];
 
-  console.log(data);
-
   const subToOptions = () => {
     if (!data) return;
 
