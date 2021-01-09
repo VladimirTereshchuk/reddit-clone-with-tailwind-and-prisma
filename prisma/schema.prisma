@@ -1,5 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
   provider = "postgresql"
@@ -11,7 +9,7 @@ generator client {
 }
 
 model Account {
-  id                 Int       @default(autoincrement()) @id
+  id                 Int       @id @default(autoincrement())
   compoundId         String    @unique @map(name: "compound_id")
   userId             Int       @map(name: "user_id")
   providerType       String    @map(name: "provider_type")
@@ -22,80 +20,94 @@ model Account {
   accessTokenExpires DateTime? @map(name: "access_token_expires")
   createdAt          DateTime  @default(now()) @map(name: "created_at")
   updatedAt          DateTime  @default(now()) @map(name: "updated_at")
-
   @@index([providerAccountId], name: "providerAccountId")
   @@index([providerId], name: "providerId")
   @@index([userId], name: "userId")
-
   @@map(name: "accounts")
 }
 
 model Session {
-  id           Int      @default(autoincrement()) @id
+  id           Int      @id @default(autoincrement())
   userId       Int      @map(name: "user_id")
   expires      DateTime
   sessionToken String   @unique @map(name: "session_token")
   accessToken  String   @unique @map(name: "access_token")
   createdAt    DateTime @default(now()) @map(name: "created_at")
   updatedAt    DateTime @default(now()) @map(name: "updated_at")
-
   @@map(name: "sessions")
 }
 
 model User {
-  id            Int       @default(autoincrement()) @id
+  id            Int         @id @default(autoincrement())
   name          String?
-  email         String?   @unique
-  emailVerified DateTime? @map(name: "email_verified")
+  email         String?     @unique
+  emailVerified DateTime?   @map(name: "email_verified")
   image         String?
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @default(now()) @map(name: "updated_at")
-  posts Post[]
-  comments Comment[]
-  votes Vote[]
-
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @default(now()) @map(name: "updated_at")
+  posts         Post[]
+  comments      Comment[]
+  votes         Vote[]
+  joinedSubs    Subreddit[]
   @@map(name: "users")
 }
 
 model VerificationRequest {
-  id         Int      @default(autoincrement()) @id
+  id         Int      @id @default(autoincrement())
   identifier String
   token      String   @unique
   expires    DateTime
-  createdAt  DateTime  @default(now()) @map(name: "created_at")
-  updatedAt  DateTime  @default(now()) @map(name: "updated_at")
-
+  createdAt  DateTime @default(now()) @map(name: "created_at")
+  updatedAt  DateTime @default(now()) @map(name: "updated_at")
   @@map(name: "verification_requests")
 }
+
 model Subreddit {
-  id         Int      @default(autoincrement()) @id
-name String @unique
-posts Post[]
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  displayName String   @default("Default name")
+  infoBoxText String   @default("default text")
+  createdAt   DateTime @default(now())
+  posts       Post[]
+  joinedUsers User[]
 }
 
-model Post{
-  id         Int      @default(autoincrement()) @id
-title String
-body String
-subreddit Subreddit
-comments Comment[]
-user User
-votes Vote[]
+model Post {
+  id          Int       @id @default(autoincrement())
+  title       String
+  body        String
+  subreddit   Subreddit @relation(fields: [subredditId], references: [id])
+  comments    Comment[]
+  user        User      @relation(fields: [userId], references: [id])
+  votes       Vote[]
+  subredditId Int
+  userId      Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
-model Comment{
-  id         Int      @default(autoincrement()) @id
-body String
-user User
-votes Vote[]
-  post Post
 
-
+model Comment {
+  id     Int    @id @default(autoincrement())
+  body   String
+  user   User   @relation(fields: [userId], references: [id])
+  votes  Vote[]
+  post   Post   @relation(fields: [postId], references: [id])
+  userId Int
+  postId Int
 }
-model Vote{
-  id         Int      @default(autoincrement()) @id
-isDownvote Boolean
-user User
-post Post?
-comment Comment?
 
+model Vote {
+  id        Int      @id @default(autoincrement())
+  voteType  VoteType
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id])
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  userId    Int
+  postId    Int?
+  commentId Int?
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
 }
