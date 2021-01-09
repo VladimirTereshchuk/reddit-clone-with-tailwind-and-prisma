@@ -7,13 +7,14 @@ import "moment-timezone";
 // import SubredditPost from "../../components/subredditPost";
 import useSWR from "swr";
 import { fetchData } from "../../utils/utils";
+import { SubredditPost } from "../../components/subredditPost";
 
 const SubReddit = ({ fullSub }) => {
   const router = useRouter();
   const { sub } = router.query;
   const [session] = useSession();
 
-  //   const subUrl = `/api/subreddit/findSubreddit?name=${sub}`;
+  const subUrl = `/api/subreddit/findSubreddit?name=${sub}`;
 
   //   const { data: fullSub, error } = useSWR(subUrl, fetchData, {
   //     initialData: props.fullSub,
@@ -57,14 +58,14 @@ const SubReddit = ({ fullSub }) => {
             <button className="w-full py-3 text-xl font-bold bg-white rounded-md shadow-sm hover:shadow-lg outline-none focus:outline-none">
               Create Post
             </button>
-            {/* {fullSub?.posts?.map((post) => (
+            {fullSub?.posts?.map((post) => (
               <SubredditPost
                 post={post}
                 subUrl={subUrl}
                 fullSub={fullSub}
                 key={post.id}
               />
-            ))} */}
+            ))}
           </div>
 
           {/* >Right Column (sidebar) */}
