@@ -1,12 +1,12 @@
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/client";
+import Layout from "../components/layout";
 
 export default function Page() {
   const [session, loading] = useSession();
-  console.log(session);
 
   return (
-    <>
+    <Layout>
       {!session && (
         <>
           Not signed in <br />
@@ -19,6 +19,6 @@ export default function Page() {
           <button onClick={signOut}>Sign out</button>
         </>
       )}
-    </>
+    </Layout>
   );
 }
