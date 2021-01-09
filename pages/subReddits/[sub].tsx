@@ -9,16 +9,16 @@ import useSWR from "swr";
 import { fetchData } from "../../utils/utils";
 import { SubredditPost } from "../../components/subredditPost";
 
-const SubReddit = ({ fullSub }) => {
+const SubReddit = (props) => {
   const router = useRouter();
   const { sub } = router.query;
   const [session] = useSession();
 
   const subUrl = `/api/subreddit/findSubreddit?name=${sub}`;
 
-  //   const { data: fullSub, error } = useSWR(subUrl, fetchData, {
-  //     initialData: props.fullSub,
-  //   });
+  const { data: fullSub, error } = useSWR(subUrl, fetchData, {
+    initialData: props.fullSub,
+  });
 
   console.log("do we have votes?", fullSub);
 
@@ -27,13 +27,13 @@ const SubReddit = ({ fullSub }) => {
     fullSub.joinedUsers.filter((user: User) => user.name === session?.user.name)
       .length > 0;
 
-  //   if (error) {
-  //     return (
-  //       <Layout>
-  //         <h1>{error.message}</h1>
-  //       </Layout>
-  //     );
-  //   }
+  if (error) {
+    return (
+      <Layout>
+        <h1>{error.message}</h1>
+      </Layout>
+    );
+  }
   return (
     <Layout>
       <div className="h-16  bg-green-400" />

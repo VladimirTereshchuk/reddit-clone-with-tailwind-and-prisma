@@ -55,7 +55,7 @@ export default function Nav() {
         {session && (
           <button
             onClick={() => {
-              // router.push("/");
+              router.push("/");
               signOut();
             }}
           >
