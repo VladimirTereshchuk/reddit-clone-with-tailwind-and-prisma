@@ -22,8 +22,25 @@ const handler = async (req, res) => {
     // check if the user has voted on this  post
     const hasVoted = votes.find((vote) => vote.postId === postId);
     console.log("has the user voted: ", hasVoted);
-    // if the user has voted - remove the vote and return the removed vote
+
     if (hasVoted) {
+      // if user hasVoted and the vote type is not the same - we change the type
+
+      if (hasVoted.voteType !== type) {
+        const updatedVote = await prisma.vote.update({
+          where: {
+            id: Number(hasVoted.id),
+          },
+          data: {
+            voteType: type,
+          },
+        });
+
+        console.log("updated vote", updatedVote);
+
+        return res.json(updatedVote);
+      }
+      // if the user has voted - remove the vote and return the removed vote
       const deletedVote = await prisma.vote.delete({
         where: {
           id: Number(hasVoted.id),
