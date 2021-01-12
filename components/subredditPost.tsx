@@ -27,9 +27,9 @@ export const SubredditPost = ({ post, subUrl, fullSub }: Props) => {
   const [session, loading] = useSession();
   const router = useRouter();
 
-  const hasVoted = post.votes.find((vote) => vote.userId === session.userId);
+  const hasVoted = post.votes.find((vote) => vote.userId === session?.userId);
 
-  const upvotePost = async (type) => {
+  const votePost = async (type) => {
     // if the user is not logged in - redirect to a login page
     if (!session && !loading) {
       router.push("/login");
@@ -134,19 +134,36 @@ export const SubredditPost = ({ post, subUrl, fullSub }: Props) => {
     });
   };
 
+  const calculateVoteCount = (votes) => {
+    const upVotes = votes.filter((vote) => vote.voteType === "UPVOTE");
+    const downVotes = votes.filter((vote) => vote.voteType === "DOWNVOTE");
+
+    const voteCount = upVotes.length - downVotes.length;
+    return voteCount;
+  };
+
   return (
     <div className="w-full bg-white  rounded-md p-4 mt-4 ">
       <div className="flex">
         <div className="flex flex-col mr-6 items-center">
           <FontAwesomeIcon
             icon={faThumbsUp}
-            className="cursor-pointer text-gray-600 hover:text-red-500"
-            onClick={() => upvotePost("UPVOTE")}
+            className={`${
+              hasVoted?.voteType === "UPVOTE"
+                ? "text-green-400"
+                : "text-gray-600"
+            } cursor-pointer hover:text-green-400`}
+            onClick={() => votePost("UPVOTE")}
           />
-          <p>{post.votes.length || 0}</p>
+          <p>{calculateVoteCount(post.votes)}</p>
           <FontAwesomeIcon
             icon={faThumbsDown}
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            className={`${
+              hasVoted?.voteType === "DOWNVOTE"
+                ? "text-red-400"
+                : "text-gray-600"
+            } cursor-pointer hover:text-red-400`}
+            onClick={() => votePost("DOWNVOTE")}
           />
         </div>
         <div>
